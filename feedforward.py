@@ -6,7 +6,7 @@ import theano.tensor as T
 import os
 import numpy as np
 
-class LSTM():
+class NN():
 	"""
 		The reinforcement learning language neural network
 	"""
@@ -52,51 +52,3 @@ class LSTM():
 		thefile=open(filename,'r')
 		oldvals=cPickle.load(thefile)
 		layers.set_all_param_values(self.l_out,oldvals)
-
-net=LSTM()
-for i,generator_filename in enumerate(os.listdir('*.json')):
-	referenceData=json.loads(''.join(open(generator_filename).readlines()))
-	modulationTypes=['Noise','FM','GMSK']
-	target=np.zeros(30)
-	for bin_ in range(30):
-		for signal in referenceData['signals']:
-			if bin_ in signal['occupied_bins']:
-				target[bin_]=modulationTypes.index(signal['modulation_type'])
-				break
-	waterfallData=makeDataFromFilename(generator_filename)
-	assert waterfallData.shape[1]==3000
-
-	train=[waterfallData[:,i*100:(i+1)*100] for i in range(30)]
-	print 'Loss of training:',net.train_function(train,target)
-
-"""
-input=T.matrix('input')
-output=T.ivector('output')
-
-l_input=layers.InputLayer((None,1000))
-l_lstm=layers.LSTMLayer(l_input,num_units=1000,nonlinearity=lasagne.nonlinearities.tanh)
-l_slice=layers.SliceLayer(l_lstm,-1)
-l_class=layers.DenseLayer(l_slice,num_units=5,nonlinearity=lasage.nonlinearities.softmax)
-
-l_outvalue=layers.get_output(l_class,input)
-loss=layers.objectives.categorical_crossentropy(l_outvalue,output)
-updates=lasagne.updates.nesterov_momentum(l_class,loss,learning_rate=0.0001)
-
-train_function=theano.function([input,output],loss,updates=updates)
-pred_function=theano.function([input],l_outvalue)
-
-
-counter=0
-for bindata,binclass in datagenerator():
-	loss=train_function(bindata, binclass)
-	counter+=1
-	if counter%100==0:
-		testdata,testclass=datagenerator()
-		testprediction=pred_function(testdata)
-		print sum([testp==testa for testp,testa in zip(testprediction,testclass)])/len(testclass)
-	if loss<0.5:
-		break
-
-
-pred_function(unknownBinData)
-"""
