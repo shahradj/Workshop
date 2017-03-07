@@ -10,7 +10,7 @@ import random
 
 class NN():
 	"""
-		The reinforcement learning language neural network
+		Neural network
 	"""
 	def __init__(self, n_in=4, n_hidden=50, n_out=3,classification=True):
 		self.hidden=n_hidden
