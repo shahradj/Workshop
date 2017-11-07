@@ -10,7 +10,7 @@ import random
 
 class NN():
 	"""
-		The reinforcement learning language neural network
+		Neural network
 	"""
 	def __init__(self, n_in=4, n_hidden=50, n_out=3,classification=True):
 		self.hidden=n_hidden
@@ -53,19 +53,19 @@ class NN():
 		#network input
 		input_ = T.matrix('input_')  # matrix of shape batch size times number of input variables
 		target_ = T.matrix('target_')# matrix of shape batch size times number of output variables
-		
+
 		#network
 		l_input=layers.InputLayer((None,n_in))
 		l_hid=layers.DenseLayer(l_input,num_units=n_hidden)
 		self.l_out=layers.DenseLayer(l_hid,num_units=n_out,nonlinearity=None)
-			
+
 		#network output
 		l_outvalue = layers.get_output(self.l_out, input_)
 		self.predict=theano.function([input_],l_outvalue,allow_input_downcast=True)
-		
+
 		#loss/cost function
 		loss = T.mean(lasagne.objectives.squared_error(l_outvalue, target_))
-		
+
 		#calculate the updates
 		params = layers.get_all_params(self.l_out)
 		updates = lasagne.updates.nesterov_momentum(loss, params, learning_rate=learning_rate, momentum=0.9)
@@ -81,7 +81,7 @@ class NN():
 		correctPredictions=[p==t for p,t in zip(predictions,target)]
 		percentage_accuracy=sum(correctPredictions)*1.0/len(target)
 		return percentage_accuracy
-		
+
 	def saveNetwork(self,filename='Weights.pkl'):
 		"""
 			save the network weights that has been trained
@@ -107,9 +107,9 @@ if __name__=='__main__':
 	traintarget_=[iris.target[k] for k in trainIndices]
 	testinput_=[iris.data[k] for k in testIndices]
 	testtarget_=[iris.target[k] for k in testIndices]
-	
+
 	batchsize=5
-	n_epochs=10
+	n_epochs=100
 	totalcosts=[]
 	for epoch in range(n_epochs):
 		#train the network
@@ -119,7 +119,7 @@ if __name__=='__main__':
 			cost=net.train_function(input_,target_)
 			totalcosts.append(cost)
 			print 'Mean cost:',np.mean(totalcosts)
-		
+
 		#test the network
 		perc_acc=net.testNetwork(testinput_,testtarget_)
 		print 'Percentage accuracy of test set:%f'%perc_acc
